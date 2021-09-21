@@ -2,7 +2,7 @@ from typing import Union
 from datetime import datetime
 
 from api.constants import DATE_FORMAT
-from api.api_object import TimetrackedApiObject
+from data_structures.api_object import TimetrackedApiObject
 
 
 class Participation(TimetrackedApiObject):

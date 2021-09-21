@@ -1,14 +1,14 @@
 import time
 from uuid import uuid4
-from flask import Flask, redirect, session
+from flask import Flask, redirect #, session
 from flask import request as frequest
 
 from task.test_task import TestTask
-
-from data_structures.fleet.participation import Participation
-from data_structures.fleet.fleet import Fleet
 from api.mock import MOCK_FLEET_MEMBERSHIP_LOGS
-
+from api.calls.character import CharacterFromID
+from api.calls.solar_system import SolarSystemFromID
+from api.calls.universe import UniverseItemsFromID
+from database.connection import MySQLConnectionManager
 from api.oauth.token import ClientToken
 from api.oauth.calls import oauth_redirect_url
 
@@ -42,9 +42,7 @@ def auth_callback():
     return "<p>Login Success!</p>"
 
 if __name__ == '__main__':
-    from api.calls.character import CharacterFromID
-    from api.calls.solar_system import SolarSystemFromID
-    from api.calls.universe import UniverseItemsFromID
+
 
     # a = CharacterFromID.get(1416973491)
     # b = SolarSystemFromID.get(30002768)
@@ -58,5 +56,8 @@ if __name__ == '__main__':
     #     new_participations = Participation.from_json_list(raw_fleet_log, fleet.fleet_id)
     #     fleet.update_participations(new_participations)
     #     time.sleep(5)
+    from data_structures.database_object import DatabaseObject
+    c = ClientToken.from_db(character_id=123)
+    t = 5
 
     app.run(host='0.0.0.0', port=8080)

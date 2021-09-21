@@ -1,7 +1,7 @@
 from typing import Union
 from datetime import datetime
 
-from api.api_object import ApiObject
+from data_structures.api_object import ApiObject
 from api.constants import DATE_FORMAT
 
 

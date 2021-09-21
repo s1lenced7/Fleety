@@ -2,14 +2,17 @@ import json
 from datetime import datetime
 from base64 import b64decode
 
-from api.api_object import ApiObject
+from data_structures.api_object import ApiObject
+from data_structures.database_object import DatabaseObject
 from api.oauth.calls import oauth_refresh_token, oauth_get_token
 from misc.exceptions import EmbeddedException
 
 
-class ClientToken(ApiObject):
+class ClientToken(ApiObject, DatabaseObject):
     eager_refresh_time = 60
     min_time_before_refresh = 60
+
+    table = 'tokens'
 
     @staticmethod
     def explode_token(token):
@@ -21,6 +24,7 @@ class ClientToken(ApiObject):
 
     def __init__(
             self,
+            character_id: int = 0,
             access_token: str = None,
             expires_in: int = 0,
             token_type: str = 'Bearer',
@@ -31,6 +35,7 @@ class ClientToken(ApiObject):
 
         self._access_token = access_token
         self.type = token_type
+        self.character_id = character_id
         self.expires_in = expires_in
         self.refresh_token = refresh_token
         self._creation_time = datetime.utcnow()
@@ -47,6 +52,8 @@ class ClientToken(ApiObject):
         return self._access_token
 
     def character_id(self):
+        if self.character_id:
+            return self.character_id
         try:
             json_token = self.explode_token(self._access_token)
             character_sub = int(json_token['sub'].split(':')[-1])

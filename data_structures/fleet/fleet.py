@@ -1,5 +1,5 @@
 from collections import defaultdict
-from api.api_object import TimetrackedApiObject, HistoricalAttribute
+from data_structures.api_object import TimetrackedApiObject
 
 from .participation import Participation
 

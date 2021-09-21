@@ -28,6 +28,7 @@ class HistoricalAttribute:
 
 
 class ApiObject:
+    select_query = None
 
     @classmethod
     def from_json(cls, raw_json, *args):
@@ -56,7 +57,7 @@ class ApiObject:
             raise ApiObjectCreationError('Failed to populate instance from obj', ex)
 
     def __init__(self, id=None, **kwargs):
-        self.id = id if id is not None else uuid4().int
+        self.id = id if id is not None else str(uuid4())
 
 
 class TimetrackedApiObject(ApiObject):

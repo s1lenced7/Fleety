@@ -1,4 +1,4 @@
-from api.api_object import ApiObject
+from data_structures.api_object import ApiObject
 
 
 class UniverseItem(ApiObject):

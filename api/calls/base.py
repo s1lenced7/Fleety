@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from misc.exceptions import EmbeddedException
 
 from api.cache import API_CACHES, args_kwargs_to_cache_key
-from api.api_object import ApiObject
+from data_structures.api_object import ApiObject
 
 GET = 'GET'
 POST = 'POST'
