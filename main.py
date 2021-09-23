@@ -45,8 +45,12 @@ def auth_callback():
 
 if __name__ == '__main__':
     quantum = CharacterFromID.get(1416973491)
-    token = next(ClientToken.from_db(character_id=quantum.id))
-    c = FleetFromCharacterID.get(quantum.id, token)
+    quantum = CharacterFromID.get(1416973491)
+
+    d = UniverseItemsFromID.get(1416973491, 95465499, 30000142)
+    d = UniverseItemsFromID.get(1416973491, 95465499, 30000142)
+    # token = next(ClientToken.from_db(character_id=quantum.id))
+    # c = FleetFromCharacterID.get(quantum.id, token)
 
     # quantum.write_to_db()
     t = 5

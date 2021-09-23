@@ -1,7 +1,9 @@
 from data_structures.api_object import ApiObject
+from data_structures.database_object import DatabaseObject
 
 
-class UniverseItem(ApiObject):
+class UniverseItem(ApiObject, DatabaseObject):
+    _table = 'universe'
 
     def __repr__(self):
         return f'UniverseItem({self.category}) {self.name}[{self.id}]'

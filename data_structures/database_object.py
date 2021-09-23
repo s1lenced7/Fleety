@@ -1,4 +1,5 @@
 from uuid import uuid4
+from typing import Iterable
 from database.connection import MySQLConnectionManager
 from database.constants import DB_NAME
 
@@ -34,8 +35,12 @@ class DatabaseObject:
             query += 'WHERE '
             additions = []
             for key, value in kwargs.items():
-                additions.append(f'{key} = %s ')
-                parameters.append(value)
+                if isinstance(value, Iterable):
+                    additions.append(f'{key} in ({", ".join("%s" for _ in range(0, len(value)))}) ')
+                    parameters += list(value)
+                else:
+                    additions.append(f'{key} = %s ')
+                    parameters.append(value)
             query += 'AND '.join(additions)
 
         rows = []

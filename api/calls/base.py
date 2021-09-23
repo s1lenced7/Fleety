@@ -5,6 +5,7 @@ from misc.exceptions import EmbeddedException
 
 from api.cache import API_CACHES, args_kwargs_to_cache_key
 from data_structures.api_object import ApiObject
+from data_structures.database_object import DatabaseObject
 
 GET = 'GET'
 POST = 'POST'
@@ -103,14 +104,31 @@ class CachedSwaggerAPICall(SwaggerApiCall):
     """
     The key method is not fool proof but it works for what we want to do with it
     """
+    @classmethod
+    def _args_kwargs_to_db_kwargs(cls, *args, **kwargs) -> dict:
+        raise NotImplementedError
+
+    @classmethod
+    def _from_db(cls, *args, **kwargs):
+        results = iter([])
+        if issubclass(cls.response_type, DatabaseObject):
+            results = cls.response_type.from_db(**cls._args_kwargs_to_db_kwargs(*args, **kwargs))
+        return results
 
     @classmethod
     def get(cls, *args, db_cache=True, **kwargs):
+        # Query local Cache
         cache = API_CACHES[cls]
-
         cache_key = args_kwargs_to_cache_key(*args, **kwargs)
         result = cache.get(cache_key)
+        # Query DB
+        if not result:
+            result = next(cls._from_db(*args, **kwargs), None)
+        # Query API
         if not result:
             result = cls._get(*args, **kwargs)
+
+        if result is not None:
             cache[cache_key] = result
+            result.write_to_db()
         return result
