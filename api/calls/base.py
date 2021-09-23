@@ -105,7 +105,7 @@ class CachedSwaggerAPICall(SwaggerApiCall):
     """
 
     @classmethod
-    def get(cls, *args, **kwargs):
+    def get(cls, *args, db_cache=True, **kwargs):
         cache = API_CACHES[cls]
 
         cache_key = args_kwargs_to_cache_key(*args, **kwargs)

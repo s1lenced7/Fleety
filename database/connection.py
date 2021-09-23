@@ -32,6 +32,8 @@ class MySQLConnection:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.leased = False
+        # TODO
+        self.close()
 
 
 class MySQLConnectionManager:
@@ -39,11 +41,13 @@ class MySQLConnectionManager:
 
     @classmethod
     def get_connection(cls):
-        connection = next((connection for connection in cls._connections if not connection.leased), None)
-        if not connection:
-            connection = cls._open_new_connection()
-            cls._connections.append(connection)
-        return connection
+        return MySQLConnection()
+        # TODO
+        # connection = next((connection for connection in cls._connections if not connection.leased), None)
+        # if not connection:
+        #     connection = cls._open_new_connection()
+        #     cls._connections.append(connection)
+        # return connection
 
     @classmethod
     def _open_new_connection(cls):

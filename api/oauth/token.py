@@ -12,11 +12,20 @@ class ClientToken(ApiObject, DatabaseObject):
     eager_refresh_time = 60
     min_time_before_refresh = 60
 
-    table = 'tokens'
+    _table = 'tokens'
 
     @staticmethod
     def explode_token(token):
         return json.loads(b64decode(token.split('.')[1].replace('-', '+').replace('_', '/')))
+
+    @classmethod
+    def character_id_from_token(cls, token):
+        try:
+            json_token = cls.explode_token(token)
+            character_sub = int(json_token['sub'].split(':')[-1])
+            return character_sub
+        except Exception as ex:
+            raise EmbeddedException('Failed to extract character id from JWT', exception=ex)
 
     @classmethod
     def from_oauth_code(cls, code):
@@ -24,22 +33,26 @@ class ClientToken(ApiObject, DatabaseObject):
 
     def __init__(
             self,
-            character_id: int = 0,
+            character_id: int = None,
             access_token: str = None,
+            refresh_token: str = None,
             expires_in: int = 0,
             token_type: str = 'Bearer',
-            refresh_token: str = None,
             **kwargs
     ):
         super().__init__(**kwargs)
 
-        self._access_token = access_token
         self.type = token_type
-        self.character_id = character_id
         self.expires_in = expires_in
         self.refresh_token = refresh_token
+
+        self._access_token = access_token
         self._creation_time = datetime.utcnow()
         self._last_update_attempt = None
+
+        self.character_id = character_id
+        if character_id is None and access_token is not None:
+            self.character_id = self.character_id_from_token(self._access_token)
 
     @property
     def expired(self):
@@ -51,17 +64,10 @@ class ClientToken(ApiObject, DatabaseObject):
             self.refresh_access_token()
         return self._access_token
 
-    def character_id(self):
-        if self.character_id:
-            return self.character_id
-        try:
-            json_token = self.explode_token(self._access_token)
-            character_sub = int(json_token['sub'].split(':')[-1])
-            return character_sub
-        except Exception as ex:
-            raise EmbeddedException('Failed to extract character id from JWT', exception=ex)
-
     def refresh_access_token(self):
+        if self.refresh_token is None:
+            return
+
         if self._last_update_attempt and (datetime.utcnow() - self._last_update_attempt).seconds >= self.min_time_before_refresh:
             raise Exception('Not enough time has passes since attempting to refresh token!')
         self._last_update_attempt = datetime.utcnow()

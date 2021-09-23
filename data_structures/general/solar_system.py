@@ -1,5 +1,6 @@
 from data_structures.api_object import ApiObject
 
+
 class SolarSystem(ApiObject):
 
     def __repr__(self):

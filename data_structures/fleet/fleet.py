@@ -6,6 +6,9 @@ from .participation import Participation
 
 class Fleet(TimetrackedApiObject):
 
+    def __repr__(self):
+        return f'Fleet[{self.id}] - {super().__repr__()}'
+
     def __init__(
             self,
             fleet_id: int,

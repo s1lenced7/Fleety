@@ -9,8 +9,8 @@ class CharacterFromID(CachedSwaggerAPICall):
     response_type = Character
 
     @classmethod
-    def _get(cls, character_id, token):
-        return cls._execute(id=character_id, route_args={'character_id': character_id}, token=token)
+    def _get(cls, character_id):
+        return cls._execute(id=character_id, route_args={'character_id': character_id})
 
 
 class FleetFromCharacterID(SwaggerApiCall):

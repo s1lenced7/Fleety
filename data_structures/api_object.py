@@ -28,7 +28,6 @@ class HistoricalAttribute:
 
 
 class ApiObject:
-    select_query = None
 
     @classmethod
     def from_json(cls, raw_json, *args):
@@ -67,7 +66,7 @@ class TimetrackedApiObject(ApiObject):
         return (other._start - self._close).seconds < self.MAX_TIMEOUT
 
     def __repr__(self):
-        return f'[{self._start.strftime("%Y-%m-%d %H:%M:%S")}UTC - {self._close.strftime("%Y-%m-%d %H:%M:%S")}UTC]'
+        return f'<{self._start.strftime("%Y-%m-%d %H:%M:%S")}UTC - {self._close.strftime("%Y-%m-%d %H:%M:%S")}UTC>'
 
     def __init__(self, *args, start: datetime = None, **kwargs):
         super().__init__(*args, **kwargs)
