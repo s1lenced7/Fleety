@@ -2,8 +2,18 @@ from abc import ABC, abstractmethod
 from typing import Callable
 from threading import Lock, Timer
 
+from misc.exceptions import EmbeddedException
 
-EXECUTION_INTERVAL = 1
+EXECUTION_INTERVAL = 60
+
+
+class TaskCreationException(EmbeddedException):
+    def __init__(self, *args, task=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.task = task
+
+class TaskAbortException(EmbeddedException):
+    """"""
 
 
 class Task(ABC):

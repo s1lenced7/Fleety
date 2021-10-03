@@ -3,6 +3,7 @@ from datetime import datetime
 
 from data_structures.api_object import ApiObject
 from data_structures.database_object import DatabaseObject
+from api.oauth.token import ClientToken
 from api.constants import DATE_FORMAT
 
 
@@ -14,7 +15,7 @@ class Character(ApiObject, DatabaseObject):
 
     def __init__(
         self,
-        user_id : int = None,
+        user_id: int = None,
         name: str = '',
         birthday: Union[datetime, str] = datetime.now(),
         bloodline_id: int = -1,
@@ -35,3 +36,6 @@ class Character(ApiObject, DatabaseObject):
         self.corporation_id = corporation_id
         self.race_id = race_id
         self.security_status = security_status
+
+    def get_auth_token(self):
+        return next(ClientToken.from_db(character_id=self.id), None)

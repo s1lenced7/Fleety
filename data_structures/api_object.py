@@ -1,7 +1,7 @@
 import json
 from uuid import uuid4
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from misc.exceptions import EmbeddedException
 
@@ -63,17 +63,17 @@ class TimetrackedApiObject(ApiObject):
     MAX_TIMEOUT = 5 * 60
 
     def __eq__(self, other: 'TimetrackedApiObject'):
-        return (other._start - self._close).seconds < self.MAX_TIMEOUT
+        return (other.start - self.close).seconds < self.MAX_TIMEOUT
 
     def __repr__(self):
-        return f'<{self._start.strftime("%Y-%m-%d %H:%M:%S")}UTC - {self._close.strftime("%Y-%m-%d %H:%M:%S")}UTC>'
+        return f'<{self.start.strftime("%Y-%m-%d %H:%M:%S")}UTC - {self.close.strftime("%Y-%m-%d %H:%M:%S")}UTC>'
 
     def __init__(self, *args, start: datetime = None, **kwargs):
         super().__init__(*args, **kwargs)
-        self._start = datetime.utcnow()
-        self._close = datetime.utcnow()
+        self.start = datetime.utcnow()
+        self.close = datetime.utcnow() + timedelta(seconds=60)
         if start:
-            self._start = start
+            self.start = start
 
     def update(self):
-        self._close = datetime.utcnow()
+        self.close = datetime.utcnow()

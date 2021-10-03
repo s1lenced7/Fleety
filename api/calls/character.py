@@ -1,6 +1,6 @@
 from .base import CachedSwaggerAPICall, SwaggerApiCall
 from data_structures.general.character import Character
-from data_structures.fleet.fleet import Fleet
+from data_structures.fleet.fleet import CharacterFleet
 
 
 class CharacterFromID(CachedSwaggerAPICall):
@@ -19,7 +19,7 @@ class CharacterFromID(CachedSwaggerAPICall):
 
 class FleetFromCharacterID(SwaggerApiCall):
     route = 'characters/{character_id}/fleet/'
-    response_type = Fleet
+    response_type = CharacterFleet
 
     @classmethod
     def _get(cls, character_id, token):

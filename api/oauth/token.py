@@ -68,7 +68,7 @@ class ClientToken(ApiObject, DatabaseObject):
         if self.refresh_token is None:
             return
 
-        if self._last_update_attempt and (datetime.utcnow() - self._last_update_attempt).seconds >= self.min_time_before_refresh:
+        if self._last_update_attempt and (datetime.utcnow() - self._last_update_attempt).seconds <= self.min_time_before_refresh:
             raise Exception('Not enough time has passes since attempting to refresh token!')
         self._last_update_attempt = datetime.utcnow()
 

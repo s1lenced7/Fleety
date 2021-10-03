@@ -12,7 +12,7 @@ class UniverseItemsFromID(CachedSwaggerAPICall):
         return cls._execute(json_body=ids)
 
     @classmethod
-    def _to_data_structure(cls, json_obj, id=None):
+    def _to_data_structure(cls, json_obj, id=None, **kwargs):
         return [super(UniverseItemsFromID, cls)._to_data_structure(obj) for obj in json_obj]
 
     @classmethod

@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from requests import request
 from abc import ABC, abstractmethod
 from misc.exceptions import EmbeddedException
@@ -41,7 +42,7 @@ class SwaggerApiCall(ABC):
     response_type: ApiObject = None
 
     @classmethod
-    def _build_url(cls, route_args=None, parameters=None):
+    def _build_url(cls, route_args=None, parameters=None, **kwargs):
         if not route_args:
             route_args = {}
         if not parameters:
@@ -60,8 +61,11 @@ class SwaggerApiCall(ABC):
         if token:
             headers['Authorization'] = f'{token.type} {token.access_token}'
 
+        # TODO: DEBUG LOGGING
+        url = cls._build_url(**kwargs)
+        print(f'[{datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}] Calling: {url}')
         return request(
-            url=cls._build_url(**kwargs),
+            url=url,
             method=POST if json_body else GET,
             headers=headers | cls.headers,
             data=json.dumps(json_body) if json_body else None
@@ -78,25 +82,30 @@ class SwaggerApiCall(ABC):
 
     @classmethod
     def _execute(cls, *args, id=None, **kwargs):
-
         try:
-            result = cls._do_request(*args, **kwargs)
+            try:
+                result = cls._do_request(*args, **kwargs)
+            except Exception as ex:
+                raise EmbeddedException('Failed to complete api call', exception=ex)
+
+            if result.status_code not in cls.response_codes:
+                raise UnexpectedStatusCode(f'Got unexpected Status Code {result.status_code}', status_code=result.status_code)
+
+            try:
+                result = json.loads(result.text)
+            except Exception as ex:
+                raise JsonDecompressionFailure('Failed to decompress ', exception=ex)
+
+            # A bit of a hack, but i wanted this to work
+            return cls._to_data_structure(result, id, **kwargs)
         except Exception as ex:
-            raise EmbeddedException('Failed to complete api call', exception=ex)
-
-        if result.status_code not in cls.response_codes:
-            raise UnexpectedStatusCode(f'Got unexpected Status Code {result.status_code}', status_code=result.status_code)
-
-        try:
-            result = json.loads(result.text)
-        except Exception as ex:
-            raise JsonDecompressionFailure('Failed to decompress ', exception=ex)
-
-        # A bit of a hack, but i wanted this to work
-        return cls._to_data_structure(result, id)
+            # TODO, for now i'll print the error and return None so the app can continue
+            #       FIX LOGGING!!!!
+            print(f'API call error, {ex}, continuing')
+            return None
 
     @classmethod
-    def _to_data_structure(cls, json_obj, id=None):
+    def _to_data_structure(cls, json_obj, id=None, **kwargs):
         return cls.response_type.from_obj(json_obj | ({'id': id} if id is not None and 'id' not in json_obj else {}))
 
 

@@ -3,9 +3,11 @@ from datetime import datetime
 
 from api.constants import DATE_FORMAT
 from data_structures.api_object import TimetrackedApiObject
+from data_structures.database_object import DatabaseObject
 
 
-class Participation(TimetrackedApiObject):
+class Participation(TimetrackedApiObject, DatabaseObject):
+    _table = 'participation'
 
     def __repr__(self):
         return f'Participation {{' \
@@ -17,7 +19,7 @@ class Participation(TimetrackedApiObject):
 
     def __init__(
             self,
-            fleet_id,
+            fleet_id: int = -1,
             character_id: int = -1,
             ship_type_id: int = -1,
             solar_system_id: int = -1,
@@ -33,14 +35,14 @@ class Participation(TimetrackedApiObject):
         self.solar_system_id = solar_system_id
 
         self.join_time = join_time
-        if join_time == str:
+        if isinstance(self.join_time, str):
             self.join_time = datetime.strptime(join_time, DATE_FORMAT)
 
     def __eq__(self, other: 'Participation'):
         """
-        Participations are considered equall as long as the character is:
+        Participations are considered equal as long as the character is:
             - In the same System
-            - Flying the same vessle
+            - Flying the same vessel
             - The other participation was less than a specific period ago
         """
         return self.fleet_id == other.fleet_id \

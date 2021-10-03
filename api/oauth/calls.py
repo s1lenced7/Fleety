@@ -1,5 +1,6 @@
 import json
 import requests
+from datetime import datetime
 from uuid import uuid4
 from urllib.parse import quote
 from requests.auth import HTTPBasicAuth
@@ -53,6 +54,8 @@ def oauth_refresh_token(refresh_token):
     grant_type=refresh_token&refresh_token=gEy...fM0
     :return:
     """
+    # TODO: DEBUG LOGGING
+    print(f'[{datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}] Attempting to Refresh OAuthToken')
     try:
         response = requests.post(
             url='https://login.eveonline.com/v2/oauth/token',
