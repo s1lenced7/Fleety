@@ -1,0 +1,37 @@
+{% extends "base/root.html" %}
+
+{% block content %}
+    <a href="{{url_for('characters.link')}}">
+        <button class="btn btn-lg btn-primary btn-block" type="submit" style="margin: 1%;">Add character</button>
+    </a>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">state</th>
+          <th scope="col">portrait</th>
+          <th scope="col">id</th>
+          <th scope="col">name</th>
+          <th scope="col">actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for character in characters %}
+            <tr>
+              <th scope="row">{{loop.index0}}</th>
+              <td></td>
+              <td>
+                  <img class="img-responsive" src="https://images.evetech.net/characters/{{character.id}}/portrait?size=32"/>
+              </td>
+              <td>{{character.id}}</td>
+              <td>{{character.name}}</td>
+              <td>
+                  <a href="{{url_for('characters.unlink')}}?character_id={{character.id}}">
+                    <button class="btn btn-danger btn-block" type="submit" style="margin: 1%;">Unlink</button>
+                  </a>
+              </td>
+            </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+{% endblock %}

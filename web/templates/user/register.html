@@ -22,26 +22,15 @@
     .form-register .form-control:focus {
       z-index: 2;
     }
-    .form-register input[type="email"] {
-      margin-bottom: -1px;
-      border-bottom-right-radius: 0;
-      border-bottom-left-radius: 0;
-    }
-    .form-register input[type="password"] {
-      margin-bottom: 10px;
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-    }
   </style>
 
-    <form class="form-register" method="post" action="{{url_for('register')}}">
+    <form class="form-register" method="post" action="{{url_for('user.register')}}">
       <h1 class="h3 mb-3 font-weight-normal">Please Register</h1>
-        <input type="email" id="inputUsername" class="form-control" placeholder="Username" required="" autofocus="">
-        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required="">
-        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required="">
-        <input type="password" id="inputRepeatPassword" class="form-control" placeholder="Repeat Password" required="">
-      <button class="btn btn-lg btn-primary btn-block" type="submit" style="margin: 1%;">Register</button>
-      <p class="mt-5 mb-3 text-muted">© 2021-2022</p>
+        <input name="username" type="text" id="inputUsername" class="form-control" placeholder="Username" required="" autofocus="">
+        <input name="email" type="email" id="inputEmail" class="form-control" placeholder="Email address" required="">
+        <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Password" required="">
+        <input name="password_repeat"  type="password" id="inputRepeatPassword" class="form-control" placeholder="Repeat Password" required="">
+      <button class="btn btn-lg btn-primary btn-block" type="submit" style="margin: 2%;">Register</button>
     </form>
 {% endblock %}
 

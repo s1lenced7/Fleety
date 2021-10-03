@@ -16,7 +16,12 @@ class ClientToken(ApiObject, DatabaseObject):
 
     @staticmethod
     def explode_token(token):
-        return json.loads(b64decode(token.split('.')[1].replace('-', '+').replace('_', '/')))
+        b64 = token.split('.')[1].replace('-', '+').replace('_', '/')
+        try:
+            return json.loads(b64decode(b64))
+        except Exception:
+            # comence eye rolling, incorrect padding is possible!
+            return json.loads(b64decode(b64 + '='))
 
     @classmethod
     def character_id_from_token(cls, token):

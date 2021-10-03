@@ -12,6 +12,7 @@ class DatabaseObject:
     _column_names = None
     _read_query = 'SELECT * FROM {db_name}.{table} '
     _write_query = 'REPLACE INTO {db_name}.{table} VALUES {values}'
+    _remove_query = 'DELETE FROM {db_name}.{table} '
 
     @classmethod
     def _get_column_names(cls):
@@ -39,7 +40,7 @@ class DatabaseObject:
             query += 'WHERE '
             additions = []
             for key, value in kwargs.items():
-                if isinstance(value, Iterable):
+                if isinstance(value, Iterable) and not isinstance(value, str):
                     additions.append(f'{key} in ({", ".join("%s" for _ in range(0, len(value)))}) ')
                     parameters += list(value)
                 else:
@@ -54,6 +55,25 @@ class DatabaseObject:
                 for row in cursor:
                     rows.append({columns[idx]: column_value for idx, column_value in enumerate(row)})
         return rows
+
+    @classmethod
+    def bulk_remove_from_db(cls, instances: list['DatabaseObject']):
+        # TODO cleanup
+        if not instances:
+            return
+
+        kwargs = {'id': [instance.id for instance in instances]}
+        columns = cls._get_column_names()
+        for key, value in kwargs.items():
+            if key not in columns:
+                raise KeyError(f'`{key}` is not a valid column in `{cls._table}`')
+
+        query = cls._remove_query.format(db_name=DB_NAME, table=cls._table)
+        query += f'WHERE id in ({", ".join("%s" for _ in range(0, len(instances)))})'
+        with MySQLConnectionManager.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, tuple(kwargs['id']))
+            connection.commit()
 
     @classmethod
     def bulk_write_to_db(cls, instances):
@@ -86,7 +106,6 @@ class DatabaseObject:
         except Exception as ex:
             raise EmbeddedException('Failed to insert new rows', exception=ex)
 
-
     @classmethod
     def from_db(cls, **kwargs):
         return iter([cls._db_row_to_obj(row) for row in cls._get_rows(**kwargs)])
@@ -101,8 +120,14 @@ class DatabaseObject:
     def write_to_db(self):
         return self.bulk_write_to_db([self])
 
+    def remove_from_db(self):
+        self.bulk_remove_from_db([self])
+
     def _obj_to_db_values(self):
         values = []
         for column in self._get_column_names():
             values.append(getattr(self, column))
         return values
+
+    def serialize(self, *args, **kwargs) -> dict:
+        return {'id': self.id}

@@ -39,3 +39,14 @@ class Character(ApiObject, DatabaseObject):
 
     def get_auth_token(self):
         return next(ClientToken.from_db(character_id=self.id), None)
+
+    def serialize(self, *args, **kwargs) -> dict:
+        return super().serialize() | {
+            'user_id': self.user_id,
+            'name': self.name,
+            'birthday': self.birthday.strftime(DATE_FORMAT),
+            'bloodline_id': self.bloodline_id,
+            'corporation_id': self.corporation_id,
+            'race_id': self.race_id,
+            'security_status': self.security_status,
+        }

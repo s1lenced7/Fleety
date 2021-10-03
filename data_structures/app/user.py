@@ -30,3 +30,11 @@ class User(DatabaseObject):
         if not raw_password:
             raise Exception('Password cannot be empty!')
         self.password_hash = get_hashed_password(raw_password)
+
+    def serialize(self) -> dict:
+        return super().serialize() | {
+            'name': self.name,
+            'email': self.email,
+            'creation_time': self.creation_time,
+            'admin': self.admin
+        }

@@ -9,7 +9,7 @@ from .exception import OAuthRefreshException, OAuthException
 
 CLIENT_ID = '397ecb975028445b929adefccfdf6611'
 CLIENT_SECRET = 'aDpOHMYFiHdlwsGyuEP27Kemq5UeRo16Gx9GUSeT'
-CALL_BACK_URL = quote('http://localhost:8080/auth_callback')
+CALL_BACK_URL = quote('http://localhost:8080/characters/link_callback')
 SCOPES = ['esi-fleets.read_fleet.v1']
 
 
@@ -74,3 +74,25 @@ def oauth_refresh_token(refresh_token):
         return json.loads(response.text)
     except Exception as ex:
         raise OAuthException('Oauth token refresh failed!', exception=ex)
+
+
+def oauth_invalidate_token(refresh_token):
+    # TODO: DEBUG LOGGING
+    print(f'[{datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}] Attempting to invalidate OAuthToken')
+    try:
+        response = requests.post(
+            url='https://login.eveonline.com/v2/oauth/revoke',
+            data={
+                'token_type_hint': 'refresh_token',
+                'token': refresh_token
+            },
+            auth=HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET),
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Host': 'login.eveonline.com',
+            }
+        )
+        if response.status_code != 200:
+            raise OAuthRefreshException('Oauth token invalidation request failed!', status_code=response.status_code)
+    except Exception as ex:
+        raise OAuthException('Oauth token invalidation failed!', exception=ex)
