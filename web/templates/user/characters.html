@@ -1,6 +1,7 @@
 {% extends "base/root.html" %}
 
 {% block content %}
+<div class="container bg-light rounded" style="margin-top: 2%; padding: 2%">
     <a href="{{url_for('characters.link')}}">
         <button class="btn btn-lg btn-primary btn-block" type="submit" style="margin: 1%;">Add character</button>
     </a>
@@ -34,4 +35,5 @@
         {% endfor %}
       </tbody>
     </table>
+</div>
 {% endblock %}

@@ -1,14 +1,22 @@
 from typing import Union
 from datetime import datetime
 
-from data_structures.api_object import ApiObject
-from data_structures.database_object import DatabaseObject
-from api.oauth.token import ClientToken
-from api.constants import DATE_FORMAT
+from api.data_structures.oauth.token import ClientToken
+from ...constants import DATE_FORMAT
+from ..base import StoredApiObject
 
 
-class Character(ApiObject, DatabaseObject):
+class Character(StoredApiObject):
     _table = 'character'
+    _route = 'characters/{character_id}/'
+
+    @staticmethod
+    def _get_kwargs_to_db_kwargs(route_args, **kwargs):
+        return {'id': route_args['character_id']}
+
+    @classmethod
+    def _get(cls, character_id):
+        return cls._execute(id=character_id, route_args={'character_id': character_id})
 
     def __repr__(self):
         return f'Character {self.name}[{self.id}]'

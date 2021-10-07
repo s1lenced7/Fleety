@@ -1,9 +1,9 @@
 from task.fleet_tracking import TrackCharacterFleet
-from api.calls.character import CharacterFromID
-from data_structures.fleet.fleet import Fleet
+from api import Fleet, Character
 
 if __name__ == '__main__':
-    character = CharacterFromID.get(1416973491)
+    user = 5
+    character = Character.get(1416973491)
     fleet_task = TrackCharacterFleet(character)
 
     t = Fleet()

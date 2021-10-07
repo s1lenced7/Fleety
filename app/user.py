@@ -1,6 +1,6 @@
 from flask import request
 from misc.crypto import get_hashed_password, check_password
-from data_structures.app.user import User
+from api import User
 
 
 def process_registration():

@@ -1,19 +1,14 @@
 from datetime import datetime
 from .task import Task, TaskCreationException, TaskAbortException
 
-from api.calls.character import FleetFromCharacterID
-from api.calls.fleet import FleetFromID
-from api.calls.participations import ParticipationsFromFleetID
-
-from data_structures.general.character import Character
-from data_structures.fleet.fleet import Fleet
-from data_structures.fleet.participation import Participation
+from api import FleetFromCharacterID, FleetFromID, ParticipationsFromFleetID
+from api.data_structures import User, Character, Fleet
 
 
 class TrackCharacterFleet(Task):
     MAX_CONSECUTIVE_FAILURES = 5
 
-    def __init__(self, character: Character, **kwargs):
+    def __init__(self, user: User, character: Character, **kwargs):
         super().__init__(**kwargs)
         self.execution_failures = 0
 
@@ -39,6 +34,8 @@ class TrackCharacterFleet(Task):
         if db_fleet and api_fleet == db_fleet:
             print('Found existing fleet in db, extending fleet')
             self.fleet = db_fleet
+
+        self.fleet.user_id = user.id
         self.fleet.update()
         self.fleet.write_to_db()
 

@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from misc.crypto import get_hashed_password
-from data_structures.database_object import DatabaseObject
+
+from ..base import DatabaseObject
 
 
 class User(DatabaseObject):

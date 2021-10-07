@@ -3,11 +3,9 @@ from misc import build_base_kwargs
 from misc.decorators import authorized
 from misc.session_keys import USER
 from flask import Blueprint, session, render_template, redirect, request
-from data_structures.general.character import Character
+from api import Character
 
-from api.oauth.calls import oauth_redirect_url, oauth_invalidate_token
-from api.oauth.token import ClientToken
-from api.calls.character import CharacterFromID
+from api import oauth_redirect_url, oauth_invalidate_token, ClientToken
 
 characters_blueprint = Blueprint('characters', __name__, )
 
@@ -31,7 +29,7 @@ def unlink():
     character_id = request.args.get('character_id')
     if not character_id:
         return redirect('/characters')
-    character = CharacterFromID.get(character_id)
+    character = next(Character.get(character_id), None)
     if not character:
         return redirect('/characters')
 
@@ -55,7 +53,7 @@ def link_callback():
     sleep(1)
     # Fetch character and translate token
     auth_token = ClientToken.from_oauth_code(code)
-    linked_character = CharacterFromID.get(auth_token.character_id)
+    linked_character = next(Character.get(auth_token.character_id), None)
     linked_character.user_id = session[USER]['id']
 
     # Persist everything to DB

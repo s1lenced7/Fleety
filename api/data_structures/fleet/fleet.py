@@ -1,13 +1,21 @@
 from collections import defaultdict
 
-from data_structures.api_object import TimetrackedApiObject, ApiObject
-from data_structures.database_object import DatabaseObject
-
+from ...constants import DATE_FORMAT
+from ..base import TimetrackedObject, StoredApiObject, ApiObject
 from .participation import Participation
 
 
-class Fleet(TimetrackedApiObject, DatabaseObject):
+class Fleet(TimetrackedObject, StoredApiObject):
     _table = 'fleet'
+    _route = 'fleets/{fleet_id}/'
+
+    @staticmethod
+    def _get_kwargs_to_db_kwargs(route_args, **kwargs):
+        return {'id': route_args['fleet_id']}
+
+    @classmethod
+    def _get(cls, fleet_id, token) -> 'Fleet':
+        return cls._execute(id=fleet_id, route_args={'fleet_id': fleet_id}, token=token)
 
     def __repr__(self):
         return f'Fleet[{self.id}] - {super().__repr__()}'
@@ -16,19 +24,25 @@ class Fleet(TimetrackedApiObject, DatabaseObject):
             self,
             is_free_move: bool = False,
             is_registered: bool = False,
-            is_voice_enabled: bool = False,
-            # We will not bother storing expensive descriptions
-            # motd: str = '',
             **kwargs
     ):
         super().__init__(**kwargs)
         self.is_free_move = is_free_move
         self.is_registered = is_registered
-        self.is_voice_enabled = is_voice_enabled
         self.participations = defaultdict(list)
+        self.user_id = None
 
     def __eq__(self, other: 'Fleet'):
         return issubclass(type(other), type(self)) and self.id == other.id
+
+    def serialize(self, *args, **kwargs) -> dict:
+        return super().serialize() | {
+            'user_id': self.user_id,
+            # 'name': self.name, TODO
+            'duration': self.duration,
+            'start': self.start.strftime(DATE_FORMAT),
+            'close': self.close.strftime(DATE_FORMAT),
+        }
 
     def update_participations(self, new_participations: list[Participation]):
         """
@@ -56,8 +70,9 @@ class Fleet(TimetrackedApiObject, DatabaseObject):
 
 class CharacterFleet(ApiObject):
     """
-        Simple data class to store the API response when querying for
+        Simple data class to store the API response when querying for the fleet
     """
+    _route = 'characters/{character_id}/fleet/'
 
     def __init__(
             self,
@@ -65,3 +80,7 @@ class CharacterFleet(ApiObject):
             **kwargs
     ):
         super().__init__(id=fleet_id, **kwargs)
+
+    @classmethod
+    def _get(cls, character_id, token):
+        return cls._execute(route_args={'character_id': character_id}, token=token)

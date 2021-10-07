@@ -1,13 +1,38 @@
 from typing import Union
 from datetime import datetime
+from collections import defaultdict
 
-from api.constants import DATE_FORMAT
-from data_structures.api_object import TimetrackedApiObject
-from data_structures.database_object import DatabaseObject
+from ...constants import DATE_FORMAT
+from ..general.character import Character
+from ..base import TimetrackedObject, ApiObject, DatabaseObject
 
 
-class Participation(TimetrackedApiObject, DatabaseObject):
+# class ParticipationSummary:
+#     """"""
+#
+#     @classmethod
+#     def from_fleet_id(cls, fleet_id):
+#         participations = list(Participation.from_db(fleet_id=fleet_id))
+
+
+class Participation(TimetrackedObject, ApiObject, DatabaseObject):
     _table = 'participation'
+    _route = 'fleets/{fleet_id}/members/'
+
+    @classmethod
+    def _get(cls, fleet_id, token) -> list['Participation']:
+        return cls._execute(fleet_id=fleet_id, route_args={'fleet_id': fleet_id}, token=token)
+
+    @classmethod
+    def summary_from_participations(cls, participations):
+        t = 5
+        # Group by character
+        participations_by_character = defaultdict(list)
+        for participation in participations:
+            participations_by_character[participation.character_id].append(participation)
+
+        for character_id, character_participations in participations_by_character.items():
+            character = Character.get_from_id(character_id)
 
     def __repr__(self):
         return f'Participation {{' \

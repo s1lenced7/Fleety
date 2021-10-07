@@ -1,15 +1,10 @@
-import time
 from uuid import uuid4
-from flask import Flask, redirect, render_template, request, session
-from flask import request as frequest
-from api.oauth.token import ClientToken
-from api.oauth.calls import oauth_redirect_url
-from app.user import process_registration
+from flask import Flask, render_template
 from misc import build_base_kwargs
-from data_structures.general.character import Character
 
 from routes.user import user_blueprint
 from routes.characters import characters_blueprint
+from routes.fleets import fleets_blueprint
 
 
 app = Flask(
@@ -20,6 +15,7 @@ app = Flask(
 )
 app.register_blueprint(user_blueprint, url_prefix='/user')
 app.register_blueprint(characters_blueprint, url_prefix='/characters')
+app.register_blueprint(fleets_blueprint, url_prefix='/fleets')
 app.secret_key = 'BAD_SECRET_KEY'
 
 state = uuid4().hex
@@ -32,4 +28,6 @@ def index():
 
 
 if __name__ == '__main__':
+    from api import Participation
+    t = Participation.from_db(id='01b453f4-cc06-4196-8d11-6194a956598d')
     app.run(host='0.0.0.0', port=8080)

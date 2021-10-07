@@ -2,13 +2,12 @@ import json
 from datetime import datetime
 from base64 import b64decode
 
-from data_structures.api_object import ApiObject
-from data_structures.database_object import DatabaseObject
-from api.oauth.calls import oauth_refresh_token, oauth_get_token
+from ..base import DatabaseObject
+from .calls import oauth_refresh_token, oauth_get_token
 from misc.exceptions import EmbeddedException
 
 
-class ClientToken(ApiObject, DatabaseObject):
+class ClientToken(DatabaseObject):
     eager_refresh_time = 60
     min_time_before_refresh = 60
 
@@ -20,7 +19,7 @@ class ClientToken(ApiObject, DatabaseObject):
         try:
             return json.loads(b64decode(b64))
         except Exception:
-            # comence eye rolling, incorrect padding is possible!
+            # commence eye rolling, incorrect padding is possible!
             return json.loads(b64decode(b64 + '='))
 
     @classmethod
