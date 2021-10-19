@@ -9,7 +9,7 @@ from .exception import OAuthRefreshException, OAuthException
 
 CLIENT_ID = '397ecb975028445b929adefccfdf6611'
 CLIENT_SECRET = 'aDpOHMYFiHdlwsGyuEP27Kemq5UeRo16Gx9GUSeT'
-CALL_BACK_URL = quote('http://localhost:8080/characters/link_callback')
+CALL_BACK_URL = quote('http://178.117.200.140:8080/characters/link_callback')
 SCOPES = ['esi-fleets.read_fleet.v1']
 
 

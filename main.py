@@ -6,7 +6,6 @@ from routes.user import user_blueprint
 from routes.characters import characters_blueprint
 from routes.fleets import fleets_blueprint
 
-
 app = Flask(
     __name__,
     static_url_path='',
@@ -28,6 +27,13 @@ def index():
 
 
 if __name__ == '__main__':
-    from api import Participation
-    t = Participation.from_db(id='01b453f4-cc06-4196-8d11-6194a956598d')
+    from api.model import Character, User, Session, System, UniverseItem
+
+    # with Session() as session:
+    #     r = Character.get_and_add(session, 1416973491)
+    #     s = System.get_and_add(session, 30002074)
+    #     u = UniverseItem.get_and_add(session, [33700])
+    #     session.commit()
+    #     t =5
+
     app.run(host='0.0.0.0', port=8080)

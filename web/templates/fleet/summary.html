@@ -6,26 +6,31 @@
       <thead>
         <tr>
           <th scope="col">#</th>
-          <th scope="col">id</th>
-          <th scope="col">start</th>
-          <th scope="col">close</th>
-          <th scope="col">duration</th>
-          <th scope="col"></th>
+          <th scope="col">Character</th>
+          <th scope="col">Favourite Ship</th>
+          <th scope="col">Favourite System</th>
+          <th scope="col">Duration</th>
         </tr>
       </thead>
       <tbody>
-        {% for fleet in fleets %}
+        {% for participation in summary %}
             <tr>
-              <th scope="row">{{loop.index0}}</th>
-              <td>{{fleet.id}}</td>
-              <td>{{fleet.start}}</td>
-              <td>{{fleet.close}}</td>
-              <td>{{fleet.duration}} minutes</td>
-              <td>
-                  <a href="{{url_for('fleets.overview', fleet_id=fleet.id)}}">
-                    <button class="btn btn-info btn-block" type="submit" style="margin: 1%;">Inspect</button>
-                  </a>
-              </td>
+                <th scope="row">{{loop.index0}}</th>
+                <td>
+                    <img class="img-responsive rounded" src="https://images.evetech.net/characters/{{participation.character.id}}/portrait?size=32"/>
+                    {{participation.character.name}}
+                </td>
+                <td>
+                    <img class="img-responsive rounded" src="https://images.evetech.net/types/{{participation.ship.id}}/render?size=32"/>
+                    {{participation.ship.name}}
+                </td>
+                <td>
+                    <img class="img-responsive rounded" src="https://images.evetech.net/types/45041/render?size=32">
+                    {{participation.system.name}}
+                </td>
+                <td>
+                    {{participation.attendance}} Minutes
+                </td>
             </tr>
         {% endfor %}
       </tbody>

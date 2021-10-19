@@ -2,16 +2,38 @@ import json
 from datetime import datetime
 from base64 import b64decode
 
-from ..base import DatabaseObject
-from .calls import oauth_refresh_token, oauth_get_token
+from sqlalchemy import *
+from sqlalchemy.orm import relationship, reconstructor
+
+from api.model import Base
+from ..api.oauth import oauth_refresh_token, oauth_get_token
 from misc.exceptions import EmbeddedException
 
 
-class ClientToken(DatabaseObject):
+class ClientToken(Base):
+    __tablename__ = 'client_token'
+
     eager_refresh_time = 60
     min_time_before_refresh = 60
 
-    _table = 'tokens'
+    id = Column(BigInteger, primary_key=True)
+    character_id = Column(BigInteger, ForeignKey('character.id'))
+    character = relationship("Character", back_populates="client_token", uselist=False)
+    refresh_token = Column(String(120))
+
+    def __init__(self, *args, access_token=None, expires_in=0, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._access_token = access_token
+        self.expires_in = expires_in
+        self._creation_time = datetime.utcnow()
+        self._last_update_attempt = None
+
+    @reconstructor
+    def init_on_load(self):
+        self._access_token = None
+        self.expires_in = 0
+        self._creation_time = datetime.utcnow()
+        self._last_update_attempt = None
 
     @staticmethod
     def explode_token(token):
@@ -33,30 +55,13 @@ class ClientToken(DatabaseObject):
 
     @classmethod
     def from_oauth_code(cls, code):
-        return cls.from_obj(oauth_get_token(code))
-
-    def __init__(
-            self,
-            character_id: int = None,
-            access_token: str = None,
-            refresh_token: str = None,
-            expires_in: int = 0,
-            token_type: str = 'Bearer',
-            **kwargs
-    ):
-        super().__init__(**kwargs)
-
-        self.type = token_type
-        self.expires_in = expires_in
-        self.refresh_token = refresh_token
-
-        self._access_token = access_token
-        self._creation_time = datetime.utcnow()
-        self._last_update_attempt = None
-
-        self.character_id = character_id
-        if character_id is None and access_token is not None:
-            self.character_id = self.character_id_from_token(self._access_token)
+        json_body = oauth_get_token(code)
+        return cls(
+            character_id=cls.character_id_from_token(json_body['access_token']),
+            refresh_token=json_body['refresh_token'],
+            access_token=json_body['access_token'],
+            expires_in=json_body['expires_in']
+        )
 
     @property
     def expired(self):
@@ -81,9 +86,7 @@ class ClientToken(DatabaseObject):
         except Exception as ex:
             raise EmbeddedException('Token Refresh request failed!', exception=ex)
 
-        ref_token = ClientToken.from_obj(obj)
-        self._access_token = ref_token._access_token
-        self.type = ref_token.type
-        self.expires_in = ref_token.expires_in
-        self.refresh_token = ref_token.refresh_token
+        self._access_token = obj['access_token']
+        self.refresh_token = obj['refresh_token']
+        self.expires_in = obj['expires_in']
         self._creation_time = datetime.utcnow()

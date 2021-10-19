@@ -2,11 +2,15 @@
 
 {% block content %}
 <div class="container bg-light rounded" style="margin-top: 2%; padding: 2%">
+    <a href="{{url_for('fleets.new')}}">
+        <button class="btn btn-lg btn-primary btn-block" type="submit" style="margin: 1%;">New Fleet</button>
+    </a>
     <table class="table">
       <thead>
         <tr>
           <th scope="col">#</th>
           <th scope="col">id</th>
+          <th scope="col">name</th>
           <th scope="col">start</th>
           <th scope="col">close</th>
           <th scope="col">duration</th>
@@ -18,9 +22,10 @@
             <tr>
               <th scope="row">{{loop.index0}}</th>
               <td>{{fleet.id}}</td>
+              <td>{{fleet.name}}</td>
               <td>{{fleet.start}}</td>
               <td>{{fleet.close}}</td>
-              <td>{{fleet.duration}} minutes</td>
+              <td>{{fleet.duration_minutes}} minutes</td>
               <td>
                   <a href="{{url_for('fleets.overview', fleet_id=fleet.id)}}">
                     <button class="btn btn-info btn-block" type="submit" style="margin: 1%;">Inspect</button>
